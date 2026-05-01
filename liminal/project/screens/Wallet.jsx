@@ -55,7 +55,7 @@ const Wallet = ({ user, role, onNav, onOpenTxn, onSend, onAddFunds, onWithdraw, 
                 <I.Request size={16} /> Request
               </button>
               <button className="balance-card__action" onClick={onWithdraw}>
-                <I.Bank size={16} /> Withdraw
+                <I.PayPal size={16} /> Withdraw
               </button>
             </div>
           </div>
@@ -63,16 +63,16 @@ const Wallet = ({ user, role, onNav, onOpenTxn, onSend, onAddFunds, onWithdraw, 
           {/* Quick chips */}
           <div className="quick-chips">
             <button className="quick-chip" onClick={onAddFunds}>
-              <div className="quick-chip__icon"><I.Card /></div>
-              <div className="quick-chip__label">Add via card</div>
-            </button>
-            <button className="quick-chip" onClick={onAddFunds}>
-              <div className="quick-chip__icon"><I.Bank /></div>
-              <div className="quick-chip__label">Bank transfer</div>
+              <div className="quick-chip__icon" style={{ background: '#003087', color: 'white' }}><I.PayPal /></div>
+              <div className="quick-chip__label">Add via PayPal</div>
             </button>
             <button className="quick-chip" onClick={onAddFunds}>
               <div className="quick-chip__icon"><I.Coin /></div>
-              <div className="quick-chip__label">Crypto on-ramp</div>
+              <div className="quick-chip__label">Transfer crypto</div>
+            </button>
+            <button className="quick-chip" onClick={onAddFunds}>
+              <div className="quick-chip__icon"><I.Card /></div>
+              <div className="quick-chip__label">Card on-ramp</div>
             </button>
             <button className="quick-chip" onClick={() => onNav('escrows')}>
               <div className="quick-chip__icon"><I.Shield /></div>

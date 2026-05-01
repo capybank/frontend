@@ -65,6 +65,9 @@ const Icons = {
   Flag: (p) => <Icon {...p}><path d="M4 21V4M4 4h13l-2 4 2 4H4"/></Icon>,
   Zap: (p) => <Icon {...p}><path d="m13 2-9 12h7l-1 8 9-12h-7z"/></Icon>,
   Hand: (p) => <Icon {...p}><path d="M9 11V5a2 2 0 1 1 4 0v6M13 8V4a2 2 0 1 1 4 0v8"/><path d="M17 8a2 2 0 1 1 4 0v7c0 4-3 7-7 7s-6-1-8-5l-2-4a2 2 0 1 1 3-2l1 2"/></Icon>,
+  // Stylised "P" mark for PayPal — generic double-P glyph, not PayPal's actual logo
+  PayPal: (p) => <Icon {...p}><path d="M7 21l1.5-9h4.2a3.5 3.5 0 0 0 0-7H8.5L6 21z"/><path d="M11 14h3.7a3.5 3.5 0 0 0 0-7"/></Icon>,
+  Exchange: (p) => <Icon {...p}><path d="M3 8h14l-3-3M21 16H7l3 3"/></Icon>,
 };
 
 window.Icons = Icons;

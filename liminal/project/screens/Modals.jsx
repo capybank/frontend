@@ -76,13 +76,13 @@ const SendMoneyModal = ({ user, onClose, onSent }) => {
 
 const AddFundsModal = ({ onClose, onAdded }) => {
   const I = window.Icons;
-  const [method, setMethod] = React.useState('card');
+  const [method, setMethod] = React.useState('paypal');
   const [amount, setAmount] = React.useState('500');
 
   const methods = [
-    { id: 'card', icon: 'Card', label: 'Debit / credit card', sub: 'Instant · 2.9% + $0.30' },
-    { id: 'bank', icon: 'Bank', label: 'Bank transfer (ACH)', sub: '1–2 business days · Free' },
-    { id: 'crypto', icon: 'Coin', label: 'From crypto wallet', sub: 'USDC, USDT, ETH · Network fee only' },
+    { id: 'paypal', icon: 'PayPal', label: 'PayPal', sub: 'Auto-converts to USDC · Instant', recommended: true, accent: '#003087' },
+    { id: 'crypto', icon: 'Coin', label: 'Transfer crypto from exchange or wallet', sub: 'USDC, USDT, ETH · Network fee only' },
+    { id: 'card', icon: 'Card', label: 'Crypto on-ramp via card', sub: 'Card → USDC instantly · 2.9% + $0.30' },
   ];
 
   return (
@@ -117,11 +117,14 @@ const AddFundsModal = ({ onClose, onAdded }) => {
                     display: 'flex', alignItems: 'center', gap: 14, padding: 14,
                     border: `2px solid ${active ? 'var(--green-500)' : 'var(--border)'}`,
                     background: active ? 'var(--green-50)' : 'var(--surface)',
-                    borderRadius: 12, textAlign: 'left',
+                    borderRadius: 12, textAlign: 'left', position: 'relative',
                   }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 999, background: 'var(--surface-2)', display: 'grid', placeItems: 'center', color: 'var(--ink-700)' }}><Ic size={18} /></div>
+                  <div style={{ width: 40, height: 40, borderRadius: 999, background: m.accent || 'var(--surface-2)', display: 'grid', placeItems: 'center', color: m.accent ? 'white' : 'var(--ink-700)' }}><Ic size={18} /></div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{m.label}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {m.label}
+                      {m.recommended && <span className="pill pill--green" style={{ padding: '1px 7px', fontSize: 10 }}>Recommended</span>}
+                    </div>
                     <div className="text-xs text-muted">{m.sub}</div>
                   </div>
                   <span style={{ width: 18, height: 18, borderRadius: 999, border: `2px solid ${active ? 'var(--green-500)' : 'var(--border-strong)'}`, background: active ? 'var(--green-500)' : 'transparent', display: 'grid', placeItems: 'center' }}>
@@ -131,6 +134,34 @@ const AddFundsModal = ({ onClose, onAdded }) => {
               );
             })}
           </div>
+
+          {/* Conversion preview — shows for PayPal + card on-ramp */}
+          {(method === 'paypal' || method === 'card') && amount && (
+            <div style={{ marginTop: 16, padding: 14, background: 'var(--surface-2)', borderRadius: 12 }}>
+              <div className="text-xs text-muted" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+                {method === 'paypal' ? 'PayPal → USDC on-ramp' : 'Card → USDC on-ramp'}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, padding: 10, background: 'var(--surface)', borderRadius: 10, textAlign: 'center', border: '1px solid var(--border)' }}>
+                  <div className="text-xs text-muted">You pay</div>
+                  <div style={{ fontWeight: 700, fontSize: 16, marginTop: 2 }}>${amount}<span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>USD</span></div>
+                  <div className="text-xs text-muted text-mono" style={{ marginTop: 2 }}>{method === 'paypal' ? 'PayPal' : 'Visa ••4221'}</div>
+                </div>
+                <I.ArrowRight size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                <div style={{ flex: 1, padding: 10, background: 'var(--green-50)', borderRadius: 10, textAlign: 'center', border: '1px solid var(--green-200)' }}>
+                  <div className="text-xs text-muted">You receive</div>
+                  <div style={{ fontWeight: 700, fontSize: 16, marginTop: 2, color: 'var(--green-700)' }}>{(parseFloat(amount) * (method === 'paypal' ? 0.995 : 0.971)).toFixed(2)}<span style={{ fontSize: 11, marginLeft: 4 }}>USDC</span></div>
+                  <div className="text-xs text-muted text-mono" style={{ marginTop: 2 }}>Base · {window.AppData.MOCK_USER_CLIENT.walletAddress.slice(0,6)}…</div>
+                </div>
+              </div>
+              <div className="text-xs text-muted" style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <I.Info size={12} />
+                {method === 'paypal'
+                  ? 'PayPal balance is auto-swapped to USDC by our on-ramp partner (0.5% fee). Settles to your DFNS wallet in ~30s.'
+                  : 'Card payment is converted to USDC by our on-ramp (2.9% + $0.30). Settles to your DFNS wallet instantly.'}
+              </div>
+            </div>
+          )}
         </div>
         <div className="modal__footer">
           <button className="btn btn--ghost" onClick={onClose}>Cancel</button>
@@ -146,34 +177,67 @@ const AddFundsModal = ({ onClose, onAdded }) => {
 const WithdrawModal = ({ user, onClose, onWithdrawn }) => {
   const I = window.Icons;
   const [amount, setAmount] = React.useState('');
+  const [dest, setDest] = React.useState('paypal');
+
+  const dests = [
+    { id: 'paypal', icon: 'PayPal', label: 'PayPal', sub: 'jordan@gmail.com · Instant', accent: '#003087' },
+    { id: 'crypto', icon: 'Coin', label: 'External crypto wallet', sub: 'USDC on Base · Network fee only' },
+  ];
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal modal--sm" onClick={e => e.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">Withdraw to bank</h3>
+          <h3 className="modal__title">Withdraw funds</h3>
           <button className="topnav__icon-btn" onClick={onClose}><I.X size={18} /></button>
         </div>
         <div className="modal__body">
-          <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: 14, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <I.Bank size={20} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>ANZ Savings ••••5512</div>
-              <div className="text-xs text-muted">Default · 1–2 business days</div>
-            </div>
-            <button className="btn btn--ghost btn--sm">Change</button>
+          <div className="field__label" style={{ marginBottom: 8 }}>Send to</div>
+          <div className="col" style={{ gap: 8, marginBottom: 16 }}>
+            {dests.map(d => {
+              const Ic = I[d.icon];
+              const active = dest === d.id;
+              return (
+                <button key={d.id} onClick={() => setDest(d.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: 12,
+                  border: `2px solid ${active ? 'var(--green-500)' : 'var(--border)'}`,
+                  background: active ? 'var(--green-50)' : 'var(--surface)',
+                  borderRadius: 12, textAlign: 'left',
+                }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 999, background: d.accent || 'var(--surface-2)', display: 'grid', placeItems: 'center', color: d.accent ? 'white' : 'var(--ink-700)' }}><Ic size={16} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{d.label}</div>
+                    <div className="text-xs text-muted">{d.sub}</div>
+                  </div>
+                  <span style={{ width: 16, height: 16, borderRadius: 999, border: `2px solid ${active ? 'var(--green-500)' : 'var(--border-strong)'}`, background: active ? 'var(--green-500)' : 'transparent', display: 'grid', placeItems: 'center' }}>
+                    {active && <I.Check size={10} style={{ color: 'white' }} />}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+
           <div className="field">
             <label className="field__label">Amount</label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 22, fontWeight: 600, color: 'var(--text-muted)' }}>$</span>
               <input className="field__input" type="number" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} style={{ paddingLeft: 30, fontSize: 22, fontWeight: 600, height: 56 }} />
             </div>
-            <span className="field__hint">Available: ${user.balance.toFixed(2)} USDC · Off-ramped via Solstice</span>
+            <span className="field__hint">Available: ${user.balance.toFixed(2)} USDC{dest === 'paypal' ? ' · Off-ramped via Solstice → PayPal' : ' · On-chain transfer'}</span>
           </div>
+
+          {dest === 'paypal' && amount && (
+            <div style={{ padding: 12, background: 'var(--surface-2)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
+              <span className="pill pill--ink text-mono" style={{ background: '#003087', color: 'white' }}><I.PayPal size={11} /> USDC → USD</span>
+              <span className="text-muted">You receive ~${(parseFloat(amount || 0) * 0.995).toFixed(2)} in PayPal</span>
+            </div>
+          )}
         </div>
         <div className="modal__footer">
           <button className="btn btn--ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn--primary" disabled={!amount} onClick={() => { onWithdrawn(parseFloat(amount)); onClose(); }}>Withdraw</button>
+          <button className="btn btn--primary" disabled={!amount} onClick={() => { onWithdrawn(parseFloat(amount)); onClose(); }}>
+            Withdraw to {dest === 'paypal' ? 'PayPal' : 'wallet'}
+          </button>
         </div>
       </div>
     </div>

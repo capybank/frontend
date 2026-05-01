@@ -113,8 +113,8 @@ const TRANSACTIONS = [
   { id: 't1', kind: 'in', title: 'Escrow released — Pet rigs (Pinewood)', sub: 'From: 0x4F1c...9a82 · 2h ago', amount: 350.00, txHash: '0x91…f4' },
   { id: 't2', kind: 'escrow', title: 'Escrow funded — Cinematic intro', sub: 'Smart contract · 0x9d8E...4Ac1 · Apr 22', amount: -500.00, txHash: '0x4a…d8' },
   { id: 't3', kind: 'in', title: 'P2P · Aria Volkov sent you USDC', sub: 'For: UI consult · Apr 21', amount: 120.00, txHash: '0xc1…e7' },
-  { id: 't4', kind: 'out', title: 'Withdraw to bank · ANZ ••5512', sub: 'Apr 19 · Pending 2 business days', amount: -800.00, txHash: '—' },
-  { id: 't5', kind: 'in', title: 'Add funds · Visa ••4221', sub: 'Apr 18 · Onramp via Stripe', amount: 1000.00, txHash: '—' },
+    { id: 't4', kind: 'out', title: 'Withdraw to PayPal · jordan@gmail.com', sub: 'Apr 19 · USDC → USD via Solstice', amount: -800.00, txHash: '0x82…1a' },
+    { id: 't5', kind: 'in', title: 'Add funds · PayPal', sub: 'Apr 18 · USD → USDC via on-ramp', amount: 1000.00, txHash: '0xa3…77' },
   { id: 't6', kind: 'in', title: 'Escrow released — Lobby build', sub: 'From: 0x771c...0aE2 · Apr 14', amount: 600.00, txHash: '0xfd…21' },
   { id: 't7', kind: 'out', title: 'Sent to Reese Okafor', sub: 'Tip · Apr 11', amount: -25.00, txHash: '0x7a…b2' },
 ];
